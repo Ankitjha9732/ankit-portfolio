@@ -1,0 +1,19 @@
+{
+  "education": [
+    {
+      "id": 1,
+      "degree": "B.Tech in Computer Science",
+      "specialization": "Artificial Intelligence & Machine Learning",
+      "institution": "Your College Name",
+      "location": "City, State",
+      "startYear": 2022,
+      "endYear": 2026,
+      "gpa": "8.5/10",
+      "description": "Currently pursuing a B.Tech in Computer Science with specialization in AI & ML. Relevant coursework includes Web Development, Data Structures, Algorithms, Machine Learning Basics.",
+      "achievements": [
+        "Dean's List (2024)",
+        "100% Attendance in Semester 1"
+      ]
+    }
+  ]
+}

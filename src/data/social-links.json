@@ -1,0 +1,28 @@
+{
+  "socialLinks": [
+    {
+      "platform": "GitHub",
+      "url": "https://github.com/yourusername",
+      "icon": "Github",
+      "label": "Follow me on GitHub"
+    },
+    {
+      "platform": "LinkedIn",
+      "url": "https://linkedin.com/in/yourusername",
+      "icon": "Linkedin",
+      "label": "Connect on LinkedIn"
+    },
+    {
+      "platform": "Twitter",
+      "url": "https://twitter.com/yourusername",
+      "icon": "Twitter",
+      "label": "Follow on Twitter"
+    },
+    {
+      "platform": "Email",
+      "url": "mailto:ankit@example.com",
+      "icon": "Mail",
+      "label": "Send me an email"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "personalInfo": {
+    "name": "Ankit Jha",
+    "title": "Frontend & Full Stack Developer",
+    "bio": "B.Tech CSE (AI & ML) Student | React Enthusiast | Building beautiful web experiences",
+    "email": "ankit@example.com",
+    "phone": "+91 9876543210",
+    "location": "India",
+    "profileImage": "/images/profile.jpg"
+  },
+  "shortBio": "Passionate about creating beautiful, responsive web applications. Currently learning MERN Stack, Three.js, and GSAP animations.",
+  "heroTitle": "Hi, I'm Ankit Jha 👋",
+  "heroSubtitle": "Frontend & Full Stack Developer passionate about building beautiful web experiences",
+  "cta": {
+    "primary": "Download Resume",
+    "secondary": "View My Work"
+  }
+}

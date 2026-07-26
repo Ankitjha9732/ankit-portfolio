@@ -1,0 +1,44 @@
+{
+  "skills": [
+    {
+      "category": "Frontend",
+      "icon": "Code",
+      "skills": [
+        { "name": "HTML5", "level": "Expert" },
+        { "name": "CSS3", "level": "Expert" },
+        { "name": "JavaScript (ES6+)", "level": "Advanced" },
+        { "name": "React", "level": "Advanced" },
+        { "name": "Tailwind CSS", "level": "Advanced" },
+        { "name": "Framer Motion", "level": "Intermediate" }
+      ]
+    },
+    {
+      "category": "Backend",
+      "icon": "Server",
+      "skills": [
+        { "name": "Node.js", "level": "Learning" },
+        { "name": "Express.js", "level": "Learning" },
+        { "name": "MongoDB", "level": "Learning" }
+      ]
+    },
+    {
+      "category": "Tools & Platforms",
+      "icon": "Wrench",
+      "skills": [
+        { "name": "Git & GitHub", "level": "Advanced" },
+        { "name": "VS Code", "level": "Advanced" },
+        { "name": "Vite", "level": "Advanced" },
+        { "name": "Vercel", "level": "Intermediate" }
+      ]
+    },
+    {
+      "category": "Currently Learning",
+      "icon": "BookOpen",
+      "skills": [
+        { "name": "MERN Stack", "level": "Learning" },
+        { "name": "Three.js", "level": "Learning" },
+        { "name": "GSAP", "level": "Learning" }
+      ]
+    }
+  ]
+}

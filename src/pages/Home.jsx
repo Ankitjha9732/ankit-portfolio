@@ -92,8 +92,8 @@ const projectsData = [
     description: 'A full-stack MERN application enabling QR-based restaurant ordering with real-time order tracking, secure admin authentication, responsive UI, and seamless customer-to-kitchen workflow.',
     tech: ['React', 'Node.js', 'Express', 'MongoDB', 'Socket.IO', 'JWT', 'Tailwind CSS'],
     features: ['QR-based Restaurant Ordering', 'Secure Authentication', 'Real-time Order Updates', 'Admin Dashboard', 'Responsive Design', 'REST API'],
-    github: 'https://github.com',
-    live: '#',
+    github: 'https://github.com/Ankitjha9732',
+    live: 'https://restro-order-new.vercel.app/',
   },
   {
     img: '/PROJECTS%20IMG/project%202%20img.png',
@@ -102,7 +102,7 @@ const projectsData = [
     description: 'A responsive Instagram Reels-inspired web application built with HTML, CSS, and JavaScript, featuring smooth vertical video scrolling, interactive like, comment, share, and follow actions with a modern mobile-first user interface.',
     tech: ['HTML5', 'CSS3', 'JavaScript'],
     features: ['Vertical Video Scrolling', 'Interactive Like & Comment', 'Share & Follow Actions', 'Mobile-first UI', 'Smooth Animations', 'Responsive Design'],
-    github: 'https://github.com',
+    github: 'https://github.com/Ankitjha9732',
     live: 'https://reel-proj.vercel.app/',
   },
   {
@@ -1223,10 +1223,10 @@ export default function Home() {
             className="flex items-center justify-center gap-5 mt-10"
           >
             {[
-              { icon: FaGithub, href: 'https://github.com', label: 'GitHub' },
+              { icon: FaGithub, href: 'https://github.com/Ankitjha9732', label: 'GitHub' },
               { icon: FaLinkedin, href: 'https://www.linkedin.com/in/ankitjhaa/', label: 'LinkedIn' },
               { icon: FaTwitter, href: 'https://x.com/Ankitjh07', label: 'Twitter' },
-              { icon: FaInstagram, href: 'https://instagram.com', label: 'Instagram' },
+              { icon: FaInstagram, href: 'https://www.instagram.com/_aka.nkit/', label: 'Instagram' },
               { icon: FaEnvelope, href: 'mailto:ankitjhaworks@gmail.com', label: 'Email' },
             ].map((social, i) => (
               <motion.a

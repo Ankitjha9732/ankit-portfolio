@@ -12,7 +12,7 @@ export const navLinks = [
 export const socialLinks = [
   {
     name: 'GitHub',
-    url: 'https://github.com',
+    url: 'https://github.com/Ankitjha9732',
     icon: 'Github',
   },
   {

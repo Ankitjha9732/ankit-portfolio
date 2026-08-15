@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=SUSE+Mono:wght@400;500;600;700;800&family=Zain:wght@400;700;800;900&family=Nunito:wght@400;600;700;800;900&family=VT323:wght@400&family=Aldrich&family=Caveat+Brush&family=Bungee&family=Calistoga&family=Delius&family=Allan&family=Mitr:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700;800&family=Cormorant+Garamond:ital,wght@1,400;1,500;1,600&family=SUSE+Mono:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -7,188 +7,212 @@
 @layer base {
   :root {
     color-scheme: dark;
-    --color-bg: #050505;
-    --color-bg-2: #080808;
-    --color-surface: #0c0c0f;
-    --color-border: #1f1f24;
-    --color-border-bright: #2c2c33;
-    --color-text: #F5F5F5;
-    --color-text-muted: #A1A1AA;
-    --color-primary: #8B5CF6;
-    --color-primary-rgb: 139, 92, 246;
-    --shadow-glow: 0 0 40px rgba(139, 92, 246, 0.14), 0 0 0 1px rgba(139, 92, 246, 0.12);
+    --bg: #050505;
+    --bg-2: #09090b;
+    --ink: #f5f5f5;
+    --muted: #a1a1aa;
+    --line: #1f1f24;
+    --line-bright: #2c2c33;
+    --violet: #8b5cf6;
+    --violet-soft: #a78bfa;
+    --violet-rgb: 139, 92, 246;
   }
 
   html {
-    @apply scroll-smooth;
-    background-color: var(--color-bg);
-  }
-
-  section[id],
-  [data-section] {
-    scroll-margin-top: 5rem;
+    background-color: var(--bg);
+    scroll-behavior: auto;
   }
 
   body {
-    @apply min-h-screen bg-[#050505] font-sans text-[#F5F5F5] antialiased;
-    background-color: #050505;
+    background-color: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* Sections are anchored as scroll targets for the spatial navigator. */
+  section[id] {
+    scroll-margin-top: 0;
+    position: relative;
   }
 
   ::selection {
-    background: rgba(139, 92, 246, 0.28);
-    color: #ffffff;
-  }
-
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    @apply font-heading font-semibold tracking-tight text-[#F5F5F5];
-  }
-
-  p {
-    @apply text-[#A1A1AA];
-  }
-
-  a {
-    @apply transition-colors duration-200;
+    background: rgba(139, 92, 246, 0.3);
+    color: #fff;
   }
 
   :focus-visible {
-    outline: 2px solid rgba(139, 92, 246, 0.7);
-    outline-offset: 2px;
-    border-radius: 4px;
+    outline: 1px solid rgba(139, 92, 246, 0.8);
+    outline-offset: 3px;
+  }
+
+  img {
+    user-select: none;
   }
 }
 
 @layer components {
-  .container-custom {
-    @apply mx-auto w-full max-w-7xl px-4 md:px-6 lg:px-8;
+  .container-port {
+    @apply mx-auto w-full max-w-[1400px] px-5 md:px-10 lg:px-14;
   }
 
-  .section-padding {
-    @apply py-20 md:py-28 lg:py-36;
+  /* Editorial kicker used at the head of every scene. */
+  .kicker {
+    @apply font-mono text-[10px] uppercase tracking-[0.34em] text-violet-400;
   }
 
-  .btn-base {
-    @apply inline-flex cursor-pointer items-center justify-center rounded-full px-6 py-3 font-semibold transition-all duration-300;
+  /* Framed data plate (fine hairline, no fill) used for metadata clusters. */
+  .plate {
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0));
   }
 
-  .btn-primary {
-    @apply btn-base bg-[#8B5CF6] text-white shadow-glow hover:-translate-y-0.5 hover:brightness-110;
+  /* Full-bleed hairline applied to edges of typographic rows. */
+  .rule-h {
+    border-top: 1px solid rgba(255, 255, 255, 0.09);
   }
 
-  .btn-secondary {
-    @apply btn-base border border-[#2c2c33] bg-white/5 text-[#F5F5F5] backdrop-blur-sm hover:border-[#8B5CF6]/50 hover:bg-white/10;
+  /* Animated text link: label + expanding underline + directional arrow. */
+  .textlink {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6em;
+    font-family: 'SUSE Mono', ui-monospace, monospace;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink);
+    background-image: linear-gradient(var(--violet), var(--violet));
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 0% 1px;
+    padding-bottom: 6px;
+    transition:
+      background-size 0.45s cubic-bezier(0.65, 0, 0.35, 1),
+      color 0.3s ease;
   }
 
-  .btn-ghost {
-    @apply btn-base border border-[#8B5CF6]/30 bg-transparent text-[#8B5CF6] hover:bg-[#8B5CF6]/10;
+  .textlink .tl-arrow {
+    display: inline-block;
+    transition: transform 0.4s cubic-bezier(0.65, 0, 0.35, 1);
   }
 
-  .gradient-text {
-    @apply bg-gradient-to-r from-[#8B5CF6] to-[#6D28D9] bg-clip-text text-transparent;
+  .textlink:hover {
+    color: #fff;
+    background-size: 100% 1px;
   }
 
-  .card-base {
-    @apply rounded-2xl border border-[#1f1f24] bg-[#0c0c0f] p-6 shadow-card;
+  .textlink:hover .tl-arrow,
+  .textlink:focus-visible .tl-arrow {
+    transform: translate(4px, -3px);
   }
 
-  .glass {
-    @apply border border-[#1f1f24] bg-white/[0.03] backdrop-blur-sm;
+  .textlink.is-dim {
+    color: var(--muted);
   }
 
-  .section-shell {
-    @apply rounded-[2rem] border border-[#1f1f24] bg-[#080808] p-6 shadow-soft md:p-10;
+  .textlink.is-dim:hover {
+    color: #fff;
   }
 
-  .grid-12 {
-    @apply grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3;
+  .textlink[data-dark] {
+    color: rgba(245, 245, 245, 0.55);
   }
 
-  .hairline {
-    @apply border-t border-[#1f1f24];
+  .textlink[data-dark]:hover {
+    color: #fff;
+  }
+
+  .magnetic {
+    display: inline-block;
+    will-change: transform;
+  }
+
+  /* Large ghost display word used as spatial backdrop. */
+  .ghost-word {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 0.9;
+    color: rgba(245, 245, 245, 0.035);
+    user-select: none;
+    pointer-events: none;
+  }
+
+  .noise-overlay {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+  }
+
+  .vignette-base {
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 42%, transparent 35%, rgba(5, 5, 5, 0.8) 100%),
+      linear-gradient(180deg, rgba(5, 5, 5, 0.55), transparent 18%, transparent 82%, rgba(5, 5, 5, 0.75));
+  }
+
+  .stage-mask {
+    background: linear-gradient(180deg, rgba(5, 5, 5, 0.85), transparent 16%, transparent 84%, rgba(5, 5, 5, 0.85));
+  }
+
+  /* Scroll cue: diagonal rule with drifting tick. */
+  .scroll-cue-line {
+    position: relative;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.16);
+    overflow: hidden;
+  }
+  .scroll-cue-line::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, var(--violet) 40%, transparent);
+    transform: translateX(-100%);
+    animation: cueDrift 2.4s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  }
+  @keyframes cueDrift {
+    0% { transform: translateX(-100%); }
+    60%, 100% { transform: translateX(100%); }
   }
 }
 
 @layer utilities {
-  .text-glow {
-    text-shadow: 0 0 30px rgba(139, 92, 246, 0.35);
+  .font-display {
+    font-family: 'Space Grotesk', sans-serif;
   }
-
-  .bg-noise {
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
-  }
-
-  .violet-mesh {
-    background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(139, 92, 246, 0.12), transparent 70%);
+  .track-meta {
+    letter-spacing: 0.3em;
   }
 }
 
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
-
-@keyframes scrollLine {
-  0%,
-  100% {
-    transform: scaleY(0);
-    transform-origin: top;
-  }
-  50% {
-    transform: scaleY(1);
-    transform-origin: top;
-  }
-}
-
-@keyframes pulse-ring {
-  0% {
-    transform: scale(0.8);
-    opacity: 0.6;
-  }
-  100% {
-    transform: scale(2.2);
-    opacity: 0;
-  }
-}
-
-/* Hide scrollbars but keep scrolling */
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-::-webkit-scrollbar-track {
-  background: #050505;
-}
+/* Raw scrollbar kept subtle. */
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: #050505; }
 ::-webkit-scrollbar-thumb {
-  background: #2c2c33;
+  background: #24242a;
   border-radius: 5px;
+  border: 3px solid #050505;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: #8b5cf6;
-}
+::-webkit-scrollbar-thumb:hover { background: #8b5cf6; }
 
-/* Respect reduced motion: strip scroll-driven/continuous animations down */
+/* Reduced motion: strip continuous + scroll-driven motion.
+   Initial hidden states are applied by JS only when motion is enabled,
+   so content stays visible for these users. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  .scroll-cue-line::after {
+    animation: none;
+    display: none;
+  }
+  html, body {
     scroll-behavior: auto !important;
   }
 }

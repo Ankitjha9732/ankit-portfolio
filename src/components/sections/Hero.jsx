@@ -1,76 +1,85 @@
 import { useRef, useEffect, lazy } from 'react'
 import gsap from 'gsap'
+import { EASE } from '../../animations/gsapSetup'
 import { useGraphicQuality, useReducedMotion } from '../../hooks/useResponsive'
-import { EASE, DURATION } from '../../animations/gsapSetup'
 import LazyScene from '../three/LazyScene'
-import MagneticButton from '../shared/MagneticButton'
+import TextLink from '../shared/TextLink'
 import { profile } from '../../data/profile'
+import { scrollToScene } from '../../data/scenes'
 
-const HeroScene = lazy(() => import('../three/HeroScene'))
+const IdentityScene = lazy(() => import('../three/IdentityScene'))
 
+/**
+ * Scene 01 — IDENTITY.
+ * A connected-node lattice core acts as the spatial centerpiece; the DOM
+ * content is a compact identity statement rather than a giant name plate.
+ * A short load sequence (geometry → name → roles → statement → cue) plays once.
+ */
 export default function Hero() {
   const sectionRef = useRef(null)
-  const sceneWrapRef = useRef(null)
-  const tlRef = useRef(null)
+  const visualRef = useRef(null)
+  const scrollRef = useRef({ y: 0 })
+  const mouseRef = useRef({ x: 0, y: 0 })
+  const pulseRef = useRef(0)
+  const lastX = useRef(0)
+  const lastY = useRef(0)
+  const lastT = useRef(0)
   const quality = useGraphicQuality()
   const reduced = useReducedMotion()
-  const introSeen = useRef(() => {
-    try {
-      return !!sessionStorage.getItem('ajp-intro-seen')
-    } catch {
-      return false
+
+  // Scene sensors: scroll depth + pointer position/velocity, shared into WebGL.
+  useEffect(() => {
+    const onScroll = () => {
+      scrollRef.current.y = window.scrollY
     }
-  })
+    const onPointer = (e) => {
+      mouseRef.current.x = (e.clientX / window.innerWidth) * 2 - 1
+      mouseRef.current.y = (e.clientY / window.innerHeight) * 2 - 1
+      const now = performance.now()
+      const dt = Math.max(16, now - lastT.current)
+      const dx = e.clientX - lastX.current
+      const dy = e.clientY - lastY.current
+      const speed = Math.sqrt(dx * dx + dy * dy)
+      pulseRef.current = Math.min(1, speed / 26 + (0.08 * dt) / 16)
+      lastX.current = e.clientX
+      lastY.current = e.clientY
+      lastT.current = now
+    }
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('pointermove', onPointer, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('pointermove', onPointer)
+    }
+  }, [])
 
   useEffect(() => {
     if (reduced) return
     const section = sectionRef.current
     if (!section) return
 
-    const startDelay = introSeen.current() ? 0.15 : 1.35
-
     const ctx = gsap.context(() => {
       const q = gsap.utils.selector(section)
-      const tl = gsap.timeline({
-        defaults: { ease: EASE.out },
-        delay: startDelay, // waits for intro (if not already seen)
-      })
+      // geometry arrives first, then the identity text is revealed.
+      const tl = gsap.timeline({ defaults: { ease: EASE.out } })
 
-      tl.fromTo(q('[data-hero-roles] > span'), { opacity: 0, y: -14 }, { opacity: 1, y: 0, duration: DURATION.fast, stagger: 0.1 })
-        .fromTo(q('[data-hero-greet]'), { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 })
+      gsap.fromTo(
+        q('[data-id-core]'),
+        { opacity: 0 },
+        { opacity: 1, duration: 1.4, ease: 'power2.out' }
+      )
+      tl.fromTo(q('[data-id-brand]'), { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.5 })
         .fromTo(
-          q('[data-hero-name]'),
-          { yPercent: 70, opacity: 0 },
-          { yPercent: 0, opacity: 1, duration: 0.7 },
-          '-=0.2'
-        )
-        .fromTo(
-          q('[data-hero-sub]'),
-          { opacity: 0, y: 18 },
-          { opacity: 1, y: 0, duration: 0.5 },
-          '-=0.3'
-        )
-        .fromTo(
-          q('[data-hero-cta] > *'),
-          { opacity: 0, y: 20 },
-          { opacity: 1, y: 0, duration: 0.4, stagger: 0.1 },
-          '-=0.2'
-        )
-        .fromTo(
-          q('[data-hero-scroll]'),
-          { opacity: 0 },
-          { opacity: 1, duration: 0.4 },
+          q('[data-id-name] .sw-word'),
+          { yPercent: 110, opacity: 0 },
+          { yPercent: 0, opacity: 1, duration: 0.85, stagger: 0.07 },
           '-=0.1'
         )
-
-      tlRef.current = tl
-
-      // Scene fades in slightly later + parallax on scroll
-      gsap.fromTo(
-        sceneWrapRef.current,
-        { opacity: 0 },
-        { opacity: 1, duration: 1.2, delay: startDelay + 0.15 }
-      )
+        .fromTo(q('[data-id-roles] > span'), { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.08 }, '-=0.4')
+        .fromTo(q('[data-id-statement]'), { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.6 }, '-=0.25')
+        .fromTo(q('[data-id-cta] > *'), { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.1 }, '-=0.35')
+        .fromTo(q('[data-id-cue]'), { opacity: 0 }, { opacity: 1, duration: 0.6 }, '-=0.1')
     }, section)
 
     return () => ctx.revert()
@@ -78,93 +87,104 @@ export default function Hero() {
 
   return (
     <section
-      id="home"
+      id="scene-identity"
       ref={sectionRef}
-      className="relative flex min-h-screen items-center overflow-hidden"
+      aria-label="Identity"
+      className="relative flex min-h-[100svh] items-start overflow-hidden md:items-stretch"
     >
-      {/* 3D background */}
+      {/* WebGL landscape */}
       <div
-        ref={sceneWrapRef}
+        ref={visualRef}
+        data-id-core
         className="absolute inset-0 opacity-0"
         aria-hidden="true"
       >
-        <LazyScene Component={HeroScene} quality={quality} reducedMotion={reduced} />
+        <LazyScene
+          Component={IdentityScene}
+          quality={quality}
+          reducedMotion={reduced}
+          scrollRef={scrollRef}
+          mouseRef={mouseRef}
+          pulseRef={pulseRef}
+        />
       </div>
 
-      {/* Depth vignette + noise */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_40%,transparent_30%,rgba(5,5,5,0.75)_100%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-noise opacity-40" />
+      {/* depth + grain */}
+      <div className="vignette-base pointer-events-none absolute inset-0" />
+      <div className="noise-overlay pointer-events-none absolute inset-0 opacity-70" />
 
-      {/* Content */}
-      <div className="container-custom relative z-10 w-full pt-28 pb-20">
-        <div className="max-w-3xl">
-          {/* Roles */}
+      {/* quiet brand mark */}
+      <div className="container-port pointer-events-none absolute left-0 right-0 top-8 z-10 flex items-center justify-between">
+        <p data-id-brand className="font-mono text-[10px] uppercase tracking-meta text-white/50">
+          Ankit Jha — Digital Developer
+        </p>
+        <p className="hidden font-mono text-[10px] tracking-meta text-white/35 md:block">
+          01<span className="text-violet-500"> / 06</span>
+        </p>
+      </div>
+
+      {/* content */}
+      <div className="container-port relative z-10 flex w-full flex-1 flex-col justify-end pb-20 pt-32 md:pb-24">
+        <div className="max-w-4xl">
+          {/* roles metadata */}
           <div
-            data-hero-roles
-            className="mb-6 flex flex-wrap gap-x-5 gap-y-2 font-mono text-[10px] uppercase tracking-[0.3em] text-[#A1A1AA]"
+            data-id-roles
+            className="mb-6 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-[10px] uppercase tracking-meta text-muted"
           >
             {profile.roles.map((r) => (
-              <span key={r}>{r}</span>
+              <span key={r} className="flex items-center gap-2">
+                <span className="h-px w-4 bg-violet-500/60" />
+                {r}
+              </span>
             ))}
           </div>
 
-          <p data-hero-greet className="mb-3 text-lg text-[#A1A1AA]">
-            Hi, I'm
-          </p>
-
-          {/* Name */}
-          <h1 className="leading-none" data-hero-name>
-            <span
-              className="block select-none uppercase"
-              style={{
-                fontFamily: "'Mitr', sans-serif",
-                fontSize: 'clamp(3.4rem, 13vw, 11rem)',
-                letterSpacing: '-0.04em',
-                lineHeight: '0.9',
-                background: 'linear-gradient(135deg, #ffffff 20%, #a78bfa 55%, #8B5CF6 80%)',
-                WebkitBackgroundClip: 'text',
-                backgroundClip: 'text',
-                color: 'transparent',
-              }}
-            >
-              Ankit Jha
+          {/* identity name — part of the environment, not a headline */}
+          <h1
+            data-id-name
+            className="font-display text-[clamp(2.6rem, 8vw, 6.5rem)] font-semibold leading-[0.95] tracking-[-0.035em] text-ink"
+          >
+            <span className="sw-word inline-block">Ankit</span>{' '}
+            <span className="sw-word inline-block">
+              <em className="font-serif italic tracking-[-0.03em] text-violet-400">Jha</em>
             </span>
           </h1>
 
-          {/* Description */}
-          <p data-hero-sub className="mt-6 max-w-xl text-base leading-relaxed text-[#A1A1AA]">
-            {profile.bio} I craft immersive digital experiences with{' '}
-            <span className="text-[#a78bfa]">React</span>,{' '}
-            <span className="text-[#a78bfa]">Three.js</span>, and{' '}
-            <span className="text-[#a78bfa]">GSAP</span>.
+          {/* statement */}
+          <p
+            data-id-statement
+            className="mt-7 max-w-md text-[15px] leading-relaxed text-muted"
+          >
+            {profile.bio} I build web experiences that combine clean engineering
+            with cinematic, intentional design.
           </p>
 
-          {/* CTAs */}
-          <div data-hero-cta className="mt-8 flex flex-wrap gap-4">
-            <MagneticButton as="a" href={profile.resumePath} download={profile.resumeName} variant="primary">
-              Download Resume
-            </MagneticButton>
-            <MagneticButton
-              as="a"
-              href="https://www.linkedin.com/in/ankitjhaa/"
-              target="_blank"
-              rel="noopener noreferrer"
-              variant="outline"
+          {/* controls */}
+          <div data-id-cta className="mt-10 flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:gap-12">
+            <TextLink arrow onClick={() => scrollToScene('work')}>
+              Explore the work
+            </TextLink>
+            <TextLink
+              href={profile.resumePath}
+              download={profile.resumeName}
+              dim
             >
-              Connect on LinkedIn
-            </MagneticButton>
+              Download resume
+            </TextLink>
           </div>
         </div>
       </div>
 
-      {/* Scroll indicator */}
+      {/* scroll cue */}
       <div
-        data-hero-scroll
-        className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2 flex flex-col items-center gap-2 text-[#A1A1AA]"
-        style={{ opacity: 0 }}
+        data-id-cue
+        className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-3"
+        style={{ opacity: reduced ? 1 : 0 }}
       >
-        <span className="font-mono text-[9px] uppercase tracking-[0.4em]">Scroll</span>
-        <span className="block h-8 w-px animate-[scrollLine_1.8s_ease-in-out_infinite] bg-gradient-to-b from-[#8B5CF6] to-transparent" />
+        <span className="font-mono text-[9px] uppercase tracking-meta text-white/45">
+          Scroll to explore
+        </span>
+        <span className="scroll-cue-line block h-px w-24" />
       </div>
     </section>
   )

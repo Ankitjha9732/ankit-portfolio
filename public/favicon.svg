@@ -1,4 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="6" fill="#D97706"/>
-  <text x="16" y="21" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="18" fill="#1D1F22" letter-spacing="-1">AK</text>
+  <rect width="32" height="32" rx="7" fill="#050505"/>
+  <path d="M9 25 L16 7 L23 25" fill="none" stroke="#8b5cf6" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M12.2 19.2 L19.8 19.2" stroke="#8b5cf6" stroke-width="3.4" stroke-linecap="round"/>
+  <circle cx="16" cy="5.6" r="1.6" fill="#c4b5fd"/>
 </svg>

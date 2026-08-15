@@ -1,21 +1,14 @@
 import { useRef, useEffect } from 'react'
-import gsap from 'gsap'
-import { EASE, DURATION } from '../../animations/gsapSetup'
+import { gsap, EASE, scrubWordReveal, riseIn } from '../../animations/gsapSetup'
 import { useReducedMotion } from '../../hooks/useResponsive'
 import { profile } from '../../data/profile'
 
 /**
- * About section: large typography reveal + portrait with parallax.
- * Content preserved from the original portfolio (FULL STACK DEVELOPER identity,
- * portrait, bio). Includes only real facts — no invented statistics.
+ * Scene 02 — STORY.
+ * The About content becomes a scroll-driven typographic narrative: the bio
+ * disintegrates word by word as the reader descends, and the portrait is a
+ * quiet platelet integrated into the environment rather than a hero image.
  */
-const FACTS = [
-  { label: 'Role', value: 'Frontend & Full Stack Developer' },
-  { label: 'Education', value: 'B.Tech CSE (AI & ML) Student' },
-  { label: 'Learning', value: 'MERN Stack · Three.js · GSAP' },
-  { label: 'Status', value: 'Available for Opportunities' },
-]
-
 export default function About() {
   const sectionRef = useRef(null)
   const reduced = useReducedMotion()
@@ -24,34 +17,22 @@ export default function About() {
     if (reduced) return
     const section = sectionRef.current
     if (!section) return
+
     const ctx = gsap.context(() => {
       const q = gsap.utils.selector(section)
 
-      // Large background word parallax
-      gsap.fromTo(
-        q('[data-about-bg]'),
-        { y: 80, opacity: 0.4 },
-        {
-          y: -80,
-          opacity: 0.8,
-          scrollTrigger: {
-            trigger: section,
-            start: 'top bottom',
-            end: 'bottom top',
-            scrub: true,
-          },
-        }
-      )
+      scrubWordReveal(q('[data-story-words]'))
 
-      // Portrait parallax
+      riseIn(q('[data-rise]'), { y: 24, stagger: 0.05 })
+
       gsap.fromTo(
-        q('[data-about-img]'),
-        { y: 40 },
+        q('[data-plate]'),
+        { y: 46 },
         {
-          y: -40,
+          y: -46,
           ease: EASE.drift,
           scrollTrigger: {
-            trigger: q('[data-about-img-wrap]')[0],
+            trigger: q('[data-plate-wrap]')[0],
             start: 'top bottom',
             end: 'bottom top',
             scrub: true,
@@ -59,95 +40,94 @@ export default function About() {
         }
       )
 
-      // Reveal copies
-      q('[data-reveal-line]').forEach((el) => {
-        gsap.fromTo(
-          el,
-          { opacity: 0, y: 40 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: DURATION.base,
-            ease: EASE.out,
-            scrollTrigger: { trigger: el, start: 'top 88%', once: true },
-          }
-        )
-      })
+      // thin rule that draws itself with a violet marker
+      gsap.fromTo(
+        q('[data-rule]')[0],
+        { scaleY: 0 },
+        {
+          scaleY: 1,
+          ease: EASE.drift,
+          scrollTrigger: {
+            trigger: q('[data-story-words]')[0],
+            start: 'top 75%',
+            end: 'bottom 40%',
+            scrub: true,
+          },
+        }
+      )
     }, section)
+
     return () => ctx.revert()
   }, [reduced])
 
   return (
     <section
-      id="about"
+      id="scene-story"
       ref={sectionRef}
-      data-section
-      className="relative overflow-hidden py-28 md:py-36"
+      aria-label="Story"
+      className="relative overflow-hidden py-28 md:py-40"
     >
-      {/* Background word */}
-      <div
-        data-about-bg
-        aria-hidden="true"
-        className="pointer-events-none absolute -top-4 left-0 select-none font-black leading-none tracking-tighter text-[#F5F5F5]/[0.04]"
-        style={{ fontFamily: "'Mitr', sans-serif", fontSize: 'clamp(6rem, 22vw, 20rem)' }}
-      >
-        ABOUT
+      <div className="ghost-word absolute left-0 top-8 select-none text-[clamp(6rem,20vw,18rem)]">
+        STORY
       </div>
 
-      <div className="container-custom relative grid grid-cols-1 items-center gap-16 lg:grid-cols-12">
-        {/* Portrait */}
-        <div data-about-img-wrap className="relative lg:col-span-5">
-          <div className="pointer-events-none absolute -inset-4 rounded-[2rem] bg-[#8B5CF6]/10 blur-2xl" />
-          <div className="pointer-events-none absolute -inset-px rounded-[1.5rem] border border-[#8B5CF6]/25" />
-          <img
-            data-about-img
-            src={profile.portrait}
-            alt="Ankit Jha — portrait"
-            loading="lazy"
-            className="relative aspect-[3/4] w-full max-w-md rounded-[1.5rem] object-cover"
-            style={{ willChange: 'transform' }}
-          />
+      <div className="container-port relative">
+        {/* scene index */}
+        <div className="mb-20 flex items-center justify-between">
+          <p className="kicker">Story</p>
+          <p className="font-mono text-[10px] tracking-meta text-white/35">
+            02<span className="text-violet-500"> / 06</span>
+          </p>
         </div>
 
-        {/* Copy */}
-        <div className="lg:col-span-7">
-          <p
-            data-reveal-line
-            className="mb-4 font-mono text-[11px] uppercase tracking-[0.35em] text-[#8B5CF6]"
-          >
-            About Me
-          </p>
-          <h2
-            data-reveal-line
-            className="mb-6 text-4xl font-bold leading-[1.05] md:text-6xl"
-            style={{ fontFamily: "'Mitr', sans-serif" }}
-          >
-            Full Stack Developer crafting{' '}
-            <span className="bg-gradient-to-r from-[#a78bfa] to-[#8B5CF6] bg-clip-text text-transparent">
-              immersive
-            </span>{' '}
-            experiences.
-          </h2>
-          <p data-reveal-line className="max-w-2xl text-base leading-relaxed">
-            {profile.bio} I combine clean engineering with cinematic design,
-            building fast, responsive, and scalable web applications.
-          </p>
+        <div className="grid grid-cols-1 gap-16 lg:grid-cols-12 lg:gap-10">
+          {/* Narrative */}
+          <div className="lg:col-span-7">
+            <p className="mb-8 max-w-xl pl-5 font-mono text-[11px] uppercase leading-relaxed tracking-meta text-muted" style={{ borderLeft: '1px solid rgba(139,92,246,0.5)' }}>
+              A developer who combines engineering discipline with a designer&apos;s eye.
+            </p>
 
-          {/* Real profile facts */}
-          <div className="mt-10 max-w-lg divide-y divide-edge rounded-2xl border border-edge bg-white/[0.02]">
-            {FACTS.map((fact, i) => (
+            <h2 data-story-words className="font-display text-[clamp(2rem,5vw,4rem)] font-semibold leading-[1.08] tracking-[-0.02em] text-ink">
+              Full Stack Developer, passionate about building fast, responsive
+              and scalable web applications with clean code and modern
+              technologies.
+            </h2>
+
+            <span data-rule className="mt-14 block h-px w-full origin-top bg-gradient-to-r from-violet-500/70 via-white/10 to-transparent" />
+          </div>
+
+          {/* Portrait integrated into the environment */}
+          <div data-plate-wrap className="lg:col-span-5">
+            <div className="relative lg:ml-auto lg:max-w-[320px]">
               <div
-                key={fact.label}
-                data-reveal-line
-                className="flex items-center justify-between gap-4 px-5 py-3.5"
-                style={{ transitionDelay: `${i * 80}ms` }}
+                data-plate
+                className="relative pl-5"
+                style={{ willChange: 'transform' }}
               >
-                <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#8B5CF6]">
-                  {fact.label}
-                </span>
-                <span className="text-sm text-[#F5F5F5]">{fact.value}</span>
+                <span className="absolute left-0 top-1 h-full w-px bg-violet-500/45" />
+                <span className="absolute -left-0.5 bottom-16 h-16 w-px bg-violet-500/80 shadow-glowline" />
+                <img
+                  src={profile.portrait}
+                  alt="Ankit Jha — portrait"
+                  loading="lazy"
+                  className="aspect-[4/5] w-full object-cover brightness-95 contrast-[1.05] saturate-[0.4] transition-[filter,transform] duration-700 hover:saturate-[0.9]"
+                />
+                <div className="mt-3 flex items-center justify-between font-mono text-[9px] uppercase tracking-meta text-white/40">
+                  <span>Ankit Jha</span>
+                  <span
+                    className="flex items-center gap-2"
+                    style={{ color: 'rgba(245,245,245,0.4)' }}
+                  >
+                    <span className="block h-1.5 w-1.5 rounded-full bg-violet-500" />
+                    Portfolio
+                  </span>
+                </div>
+                <p className="mt-6 max-w-[240px] text-[13px] leading-relaxed text-muted">
+                  Designing and engineering creative, performant interfaces —
+                  one deliberate detail at a time.
+                </p>
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </div>

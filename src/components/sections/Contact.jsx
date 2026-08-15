@@ -1,38 +1,31 @@
 import { useRef, useEffect, lazy } from 'react'
 import gsap from 'gsap'
-import { EASE, DURATION } from '../../animations/gsapSetup'
+import { EASE } from '../../animations/gsapSetup'
 import { useGraphicQuality, useReducedMotion } from '../../hooks/useResponsive'
+import { useScrollProgress } from '../../hooks/useScrollProgress'
 import LazyScene from '../three/LazyScene'
-import MagneticButton from '../shared/MagneticButton'
-import { contactRows, opportunities, socialLinks } from '../../data/profile'
-import { FaGithub, FaLinkedin, FaTwitter, FaInstagram, FaEnvelope, FaMapMarkerAlt } from 'react-icons/fa'
+import TextLink from '../shared/TextLink'
+import { profile, socialLinks, contactRows } from '../../data/profile'
 
-const ContactScene = lazy(() => import('../three/ContactScene'))
+const ConvergenceScene = lazy(() => import('../three/ConvergenceScene'))
 
-const ICON_MAP = {
-  email: FaEnvelope,
-  linkedin: FaLinkedin,
-  github: FaGithub,
-  twitter: FaTwitter,
-  location: FaMapMarkerAlt,
-}
-
-const SOCIAL_ICON_MAP = {
-  github: FaGithub,
-  linkedin: FaLinkedin,
-  twitter: FaTwitter,
-  instagram: FaInstagram,
-  email: FaEnvelope,
-}
+const DIR = [
+  { label: 'Email', value: profile.email, url: `mailto:${profile.email}` },
+  ...socialLinks
+    .filter((s) => s.icon !== 'instagram' && s.icon !== 'email')
+    .map((s) => ({ label: s.label, value: s.url.replace(/^https?:\/\/(www\.)?/, ''), url: s.url })),
+]
 
 /**
- * Contact / final scene: large typography, 3D torus + particle halo, magnetic CTAs,
- * contact columns, social icons. All contact links/badges preserved.
+ * Scene 06 — CONNECT.
+ * The ending of the journey: the environment quiets and converges into a
+ * point, and the closing statement + real contact directory appear there.
  */
 export default function Contact() {
   const sectionRef = useRef(null)
   const quality = useGraphicQuality()
   const reduced = useReducedMotion()
+  const progress = useScrollProgress(sectionRef, 1)
 
   useEffect(() => {
     if (reduced) return
@@ -41,162 +34,122 @@ export default function Contact() {
     const ctx = gsap.context(() => {
       const q = gsap.utils.selector(section)
 
-      q('[data-reveal]').forEach((el, i) => {
-        gsap.fromTo(
-          el,
-          { opacity: 0, y: 30 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: DURATION.base,
-            delay: i * 0.06,
-            ease: EASE.out,
-            scrollTrigger: { trigger: el, start: 'top 90%', once: true },
-          }
-        )
-      })
+      gsap.fromTo(
+        q('[data-final-block]'),
+        { opacity: 0, y: 60 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1.2,
+          ease: EASE.out,
+          scrollTrigger: {
+            trigger: q('[data-final-block]')[0],
+            start: 'top 70%',
+            end: 'top 25%',
+            scrub: 0.5,
+          },
+        }
+      )
+      gsap.fromTo(
+        q('[data-dir-row]'),
+        { opacity: 0, x: -24 },
+        {
+          opacity: 1,
+          x: 0,
+          duration: 0.6,
+          stagger: 0.06,
+          ease: EASE.out,
+          scrollTrigger: { trigger: q('[data-dir]')[0], start: 'top 80%', once: true },
+        }
+      )
     }, section)
     return () => ctx.revert()
   }, [reduced])
 
+  const status = contactRows.find((r) => r.label === 'STATUS')?.value
+  const base = contactRows.find((r) => r.label === 'LOCATION')?.value
+  const response = contactRows.find((r) => r.label === 'RESPONSE')?.value
+
   return (
     <section
-      id="contact"
+      id="scene-connect"
       ref={sectionRef}
-      data-section
+      aria-label="Connect"
       className="relative overflow-hidden"
     >
-      {/* 3D final scene backdrop */}
-      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-        <LazyScene Component={ContactScene} quality={quality} />
+      <div className="absolute inset-0" aria-hidden="true">
+        <LazyScene Component={ConvergenceScene} quality={quality} reducedMotion={reduced} progressRef={progress} />
       </div>
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#050505] via-transparent to-[#050505]" />
+      <div className="vignette-base pointer-events-none absolute inset-0" />
 
-      <div className="container-custom relative py-32 md:py-44">
-        <div className="text-center">
-          <p data-reveal className="mb-4 font-mono text-[11px] uppercase tracking-[0.35em] text-[#8B5CF6]">
-            Contact
+      <div className="container-port relative">
+        <div className="flex items-center justify-between pt-24">
+          <p className="kicker">Connect</p>
+          <p className="font-mono text-[10px] tracking-meta text-white/35">
+            06<span className="text-violet-500"> / 06</span>
           </p>
-          <h2
-            data-reveal
-            className="bg-gradient-to-r from-[#F5F5F5] via-[#a78bfa] to-[#8B5CF6] bg-clip-text text-5xl font-bold leading-none text-transparent md:text-8xl"
-            style={{ fontFamily: "'Mitr', sans-serif" }}
-          >
-            Let's Build
-            <br />
-            Something
+        </div>
+
+        {/* journey through empty space before the point resolves */}
+        <div className="hidden md:block" style={{ height: '44vh' }} />
+
+        {/* final block resolves at the convergence point */}
+        <div data-final-block className="pb-10 pt-16 md:pt-24">
+          <h2 className="font-display font-semibold leading-[0.95] tracking-[-0.035em] text-ink">
+            <span className="block text-[clamp(2.6rem,7vw,5.6rem)]">LET&apos;S BUILD</span>
+            <span className="block text-[clamp(2.6rem,7vw,5.6rem)]">SOMETHING</span>
+            <span className="block font-serif italic font-medium text-violet-400 text-[clamp(2.6rem,7vw,5.6rem)]">
+              together.
+            </span>
           </h2>
-          <p data-reveal className="mx-auto mt-6 max-w-md text-[#A1A1AA]">
-            Open to full-stack roles, freelance, and collaborations. I usually
-            reply within 24 hours.
+
+          <p className="mt-8 max-w-md text-[15px] leading-relaxed text-muted">
+            {profile.title} open to full-stack roles, freelance work and
+            open-source collaboration — {response?.toLowerCase() || 'fast replies'}.
           </p>
 
-          <div data-reveal className="mt-10 flex flex-wrap items-center justify-center gap-4">
-            <MagneticButton as="a" href="mailto:ankitjhaworks@gmail.com" variant="primary">
-              Send an Email
-            </MagneticButton>
-            <MagneticButton
-              as="a"
-              href="https://www.linkedin.com/in/ankitjhaa/"
-              target="_blank"
-              rel="noopener noreferrer"
-              variant="outline"
-            >
-              Connect on LinkedIn
-            </MagneticButton>
-          </div>
-        </div>
-
-        {/* Opportunities + Contact spec */}
-        <div className="mt-24 grid grid-cols-1 gap-8 lg:grid-cols-2">
-          {/* Opportunities */}
-          <div data-reveal className="rounded-3xl border border-edge bg-white/[0.02] p-8 backdrop-blur-sm">
-            <div className="mb-6 flex items-center gap-3">
-              <span className="relative flex h-3 w-3">
-                <span className="absolute inset-0 rounded-full bg-[#8B5CF6] opacity-60 animate-ping" />
-                <span className="absolute inset-0 rounded-full bg-[#8B5CF6]" />
-              </span>
-              <span className="text-sm font-semibold text-[#F5F5F5]">
-                Available for Work
-              </span>
-            </div>
-            <ul className="space-y-3">
-              {opportunities.map((item) => (
-                <li key={item} className="flex items-center gap-3 text-sm text-[#A1A1AA]">
-                  <span className="h-1 w-1 rounded-full bg-[#8B5CF6]" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-
-            {/* Socials */}
-            <div className="mt-8 border-t border-edge pt-6">
-              <p className="mb-4 font-mono text-[9px] uppercase tracking-[0.25em] text-[#A1A1AA]">
-                Elsewhere
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {socialLinks.map((s) => {
-                  const Icon = SOCIAL_ICON_MAP[s.icon]
-                  return (
-                    <a
-                      key={s.label}
-                      href={s.url}
-                      target={s.url.startsWith('mailto') ? undefined : '_blank'}
-                      rel="noopener noreferrer"
-                      aria-label={s.label}
-                      className="flex h-11 w-11 items-center justify-center rounded-full border border-edge text-[#A1A1AA] transition-all duration-200 hover:border-[#8B5CF6]/60 hover:text-[#a78bfa] hover:-translate-y-0.5"
-                    >
-                      {Icon && <Icon className="h-4 w-4" />}
-                    </a>
-                  )
-                })}
-              </div>
-            </div>
-          </div>
-
-          {/* Contact spec */}
-          <div data-reveal className="overflow-hidden rounded-3xl border border-edge bg-white/[0.02] backdrop-blur-sm">
-            <div className="border-b border-edge bg-[#8B5CF6]/10 px-6 py-4">
-              <h3 className="font-mono text-xs font-bold uppercase tracking-[0.25em] text-[#a78bfa]">
-                Contact Spec
-              </h3>
-            </div>
-            <div>
-              {contactRows.map((row) => {
-                const Icon = row.icon ? ICON_MAP[row.icon] : null
-                return (
-                  <div
-                    key={row.label}
-                    className="flex items-center justify-between gap-4 border-b border-edge/60 px-6 py-3.5 last:border-0"
+          {/* directory */}
+          <div data-dir className="mt-14 max-w-2xl border-t border-line">
+            {DIR.map((r) => {
+              const external = r.url.startsWith('http')
+              return (
+                <div
+                  key={r.label}
+                  data-dir-row
+                  className="group flex items-center justify-between gap-6 border-b border-line py-5"
+                >
+                  <span className="font-mono text-[10px] uppercase tracking-meta text-white/45">
+                    {r.label}
+                  </span>
+                  <TextLink
+                    href={r.url}
+                    target={external ? '_blank' : undefined}
+                    rel={external ? 'noopener noreferrer' : undefined}
+                    arrow={external}
                   >
-                    <div className="flex items-center gap-2 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#A1A1AA]">
-                      {Icon && <Icon className="h-3 w-3 text-[#8B5CF6]" />}
-                      {row.label}
-                    </div>
-                    <div className="text-right text-sm font-semibold text-[#F5F5F5]">
-                      {row.label === 'STATUS' ? (
-                        <span className="flex items-center gap-2">
-                          <span className="h-2 w-2 rounded-full bg-[#8B5CF6] shadow-[0_0_8px_rgba(139,92,246,0.8)]" />
-                          {row.value}
-                        </span>
-                      ) : (
-                        row.value
-                      )}
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
+                    {r.value}
+                  </TextLink>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* meta footer line */}
+          <div className="mt-16 flex flex-wrap items-center gap-x-10 gap-y-3 font-mono text-[9px] uppercase tracking-meta text-white/40">
+            <span className="flex items-center gap-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-violet-500 shadow-glowline" />
+              {status}
+            </span>
+            <span>{base}</span>
+            <span>{response}</span>
+          </div>
+
+          <div className="mt-20 border-t border-line pt-8 pb-12">
+            <p className="font-mono text-[9px] uppercase tracking-meta text-white/40">
+              © 2026 Ankit Jha — crafted with React, Three.js &amp; GSAP
+            </p>
           </div>
         </div>
-
-        {/* Big closing line */}
-        <p
-          data-reveal
-          className="mt-24 text-center font-mono text-[10px] uppercase tracking-[0.4em] text-[#A1A1AA]/60"
-        >
-          © 2024 Ankit Jha · Crafted with React, Three.js &amp; GSAP
-        </p>
       </div>
     </section>
   )

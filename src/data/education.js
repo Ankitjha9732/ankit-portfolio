@@ -46,3 +46,35 @@ export const education = [
     ],
   },
 ]
+
+/**
+ * Developer journey milestones, built strictly from the education data above.
+ * The 2027 node is the end of the declared B.Tech period (2024–2027), not an
+ * invented achievement.
+ */
+export const journeyMilestones = [
+  {
+    year: '2021',
+    phase: 'Started',
+    title: 'Diploma — Computer Science & Engineering',
+    org: 'Government Polytechnic Muzaffarpur',
+    tag: 'completed',
+    subjects: education.find((e) => e.id === 'diploma').subjects,
+  },
+  {
+    year: '2024',
+    phase: 'Graduated · and began the degree',
+    title: 'B.Tech — Computer Science (AI & ML)',
+    org: 'CDLU Sirsa',
+    tag: 'current',
+    subjects: education.find((e) => e.id === 'btech').subjects,
+  },
+  {
+    year: '2027',
+    phase: 'Projected graduation',
+    title: 'B.Tech — Computer Science (AI & ML)',
+    org: 'CDLU Sirsa',
+    tag: 'next',
+    subjects: null,
+  },
+]

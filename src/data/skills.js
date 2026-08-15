@@ -61,3 +61,20 @@ export const ecosystemTech = [
 
 // Core labels used for the ecosystem hub.
 export const coreTech = ['JavaScript', 'React', 'Node.js']
+
+/**
+ * Graph of every real technology from the source categories, each carrying
+ * its category, proficiency level (when declared) and whether it is a
+ * "currently learning" skill. Keeps the learning distinction explicit.
+ */
+export const techNodes = skillCategories.flatMap((group) =>
+  group.skills.map((tech) => {
+    const progress = group.progress.find((p) => p.label === tech)
+    return {
+      tech,
+      category: group.category,
+      level: progress ? progress.level : null,
+      learning: group.category === 'Learning',
+    }
+  })
+)

@@ -1,10 +1,12 @@
 import { useEffect } from 'react'
 import Lenis from 'lenis'
+import { registerLenis } from '../lib/scroll'
 import { gsap, ScrollTrigger } from '../animations/gsapSetup'
 
 /**
- * Hook to enable smooth scrolling using Lenis, synced with GSAP ScrollTrigger.
- * Call once in the main layout.
+ * Smooth scrolling with Lenis, synced with GSAP ScrollTrigger.
+ * The instance is registered so the spatial navigator and inline CTAs
+ * can animate the page to scene targets.
  */
 export function useSmoothScroll() {
   useEffect(() => {
@@ -12,14 +14,14 @@ export function useSmoothScroll() {
     if (mq.matches) return
 
     const lenis = new Lenis({
-      duration: 1.1,
+      duration: 1.15,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
       smoothTouch: false,
-      touchMultiplier: 1.6,
+      touchMultiplier: 1.4,
     })
+    registerLenis(lenis)
 
-    // Keep Lenis and ScrollTrigger in sync.
     lenis.on('scroll', ScrollTrigger.update)
     const raf = (time) => {
       lenis.raf(time * 1000)
@@ -30,6 +32,7 @@ export function useSmoothScroll() {
     return () => {
       gsap.ticker.remove(raf)
       lenis.destroy()
+      registerLenis(null)
       ScrollTrigger.clearScrollMemory()
     }
   }, [])

@@ -116,7 +116,7 @@ export default function Contact() {
                 <div
                   key={r.label}
                   data-dir-row
-                  className="group flex items-center justify-between gap-6 border-b border-line py-5"
+                  className="group flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-b border-line py-5"
                 >
                   <span className="font-mono text-[10px] uppercase tracking-meta text-white/45">
                     {r.label}

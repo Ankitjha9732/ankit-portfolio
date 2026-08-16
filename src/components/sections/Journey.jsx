@@ -33,7 +33,10 @@ export default function Journey() {
     const ctx = gsap.context(() => {
       const q = gsap.utils.selector(section)
       q('[data-milestone]').forEach((el, i) => {
-        const xFrom = i % 2 === 0 ? -40 : 40
+        // Horizontal travel reads as editorial rhythm on desktop but shoves
+        // rows off-screen on phones (translateX can clip inside the small
+        // viewport), so it is disabled below the md breakpoint.
+        const xFrom = window.matchMedia('(min-width: 768px)').matches ? (i % 2 === 0 ? -40 : 40) : 0
         gsap.fromTo(
           el,
           { opacity: 0, y: 70, x: xFrom },

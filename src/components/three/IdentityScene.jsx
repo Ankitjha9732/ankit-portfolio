@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
@@ -241,6 +241,41 @@ function Rig({ reducedMotion, scrollRef, mouseRef, children }) {
 }
 
 /**
+ * Reports whether the hero canvas is in a compact viewport (small phone or a
+ * short landscape screen). In those layouts the lattice is pulled up and
+ * slightly scaled so it stays clear of the bottom-anchored identity block.
+ */
+function useCompactCore() {
+  const [layout, setLayout] = useState({
+    y: 0.55,
+    scale: 1,
+  })
+
+  useEffect(() => {
+    const phone = window.matchMedia('(max-width: 767px)')
+    const short = window.matchMedia('(max-height: 600px) and (orientation: landscape)')
+    const apply = () => {
+      if (phone.matches) {
+        setLayout({ y: 1.15, scale: 0.82 })
+      } else if (short.matches) {
+        setLayout({ y: 0.9, scale: 0.75 })
+      } else {
+        setLayout({ y: 0.55, scale: 1 })
+      }
+    }
+    apply()
+    phone.addEventListener('change', apply)
+    short.addEventListener('change', apply)
+    return () => {
+      phone.removeEventListener('change', apply)
+      short.removeEventListener('change', apply)
+    }
+  }, [])
+
+  return layout
+}
+
+/**
  * Hero identity scene — a connected-node lattice core inside a drifting
  * particle field. Reacts to pointer (parallax), pointer velocity (pulse on
  * the core), and page scroll (slow vertical drift).
@@ -253,6 +288,7 @@ export default function IdentityScene({
   pulseRef = { current: 0 },
 }) {
   const isMobile = quality === 'low'
+  const { y, scale } = useCompactCore()
 
   return (
     <Canvas
@@ -263,7 +299,9 @@ export default function IdentityScene({
     >
       <Rig reducedMotion={reducedMotion} scrollRef={scrollRef} mouseRef={mouseRef}>
         <ParticleField count={isMobile ? 320 : 700} spread={isMobile ? 6.5 : 8} animate={!reducedMotion} />
-        <Core pulseRef={pulseRef} />
+        <group position={[0, y, 0]} scale={scale}>
+          <Core pulseRef={pulseRef} />
+        </group>
       </Rig>
     </Canvas>
   )

@@ -115,7 +115,24 @@ function CaseStudy({ project, index, stages, Scene, quality, reduced }) {
       cancelAnimationFrame(raf)
       raf = requestAnimationFrame(() => {
         const raw = progress.current.value
-        const paced = Math.min(1, raw / SPLIT)
+        // Stacked layouts (mobile / portrait tablet: single column, canvas
+        // scrolls with the page instead of sticking) drive the story from the
+        // canvas's own visibility window — it completes exactly as the visual
+        // leaves the viewport, so nothing fires after the canvas is gone. On
+        // desktop the side-by-side sticky canvas keeps the original whole-case
+        // pacing (SPLIT).
+        const canvasEl = sectionRef.current
+          ? sectionRef.current.querySelector('[data-case-canvas]')
+          : null
+        let paced
+        const stacked = window.matchMedia('(max-width: 1023px)').matches
+        if (stacked && canvasEl) {
+          const rect = canvasEl.getBoundingClientRect()
+          const vh = window.innerHeight || 1
+          paced = Math.min(1, Math.max(0, 1 - rect.bottom / vh))
+        } else {
+          paced = Math.min(1, raw / SPLIT)
+        }
         drive.current.value = paced
         if (!stages) return
         let label = stages[0].label
@@ -126,9 +143,11 @@ function CaseStudy({ project, index, stages, Scene, quality, reduced }) {
       })
     }
     window.addEventListener('scroll', update, { passive: true })
+    window.addEventListener('resize', update)
     update()
     return () => {
       window.removeEventListener('scroll', update)
+      window.removeEventListener('resize', update)
       cancelAnimationFrame(raf)
     }
   }, [stages, progress, reduced])
@@ -167,6 +186,7 @@ function CaseStudy({ project, index, stages, Scene, quality, reduced }) {
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-8">
           {/* Sticky stage canvas */}
           <div
+            data-case-canvas
             className={`relative order-1 ${featured ? 'h-[56vh]' : 'h-[52vh]'} lg:order-2 lg:col-span-7 lg:${
               featured ? 'h-[96vh]' : 'h-[92vh]'
             } lg:overflow-visible`}

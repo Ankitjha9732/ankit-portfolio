@@ -291,12 +291,12 @@ export default function RestroScene({ progressRef, quality = 'high', reducedMoti
       frameloop={reducedMotion ? 'demand' : 'always'}
       style={{ pointerEvents: 'none' }}
     >
-      <Rig progressRef={progressRef} reducedMotion={reducedMotion} isMobile={isMobile}>
+      <Rig progressRef={progressRef} reducedMotion={reducedMotion}>
         <TableQR p={progressRef} reduced={reducedMotion} />
-        {!isMobile && <MenuFan p={progressRef} reduced={reducedMotion} />}
-        {!isMobile && <CartTicket p={progressRef} reduced={reducedMotion} />}
-        {!isMobile && <StatusChain p={progressRef} reduced={reducedMotion} />}
-        {!isMobile && <AdminPanel p={progressRef} reduced={reducedMotion} />}
+        <MenuFan p={progressRef} reduced={reducedMotion} />
+        <CartTicket p={progressRef} reduced={reducedMotion} />
+        <StatusChain p={progressRef} reduced={reducedMotion} />
+        <AdminPanel p={progressRef} reduced={reducedMotion} />
       </Rig>
     </Canvas>
   )

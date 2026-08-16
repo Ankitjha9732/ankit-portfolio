@@ -2,7 +2,6 @@ import { useRef, useEffect, lazy } from 'react'
 import gsap from 'gsap'
 import { EASE } from '../../animations/gsapSetup'
 import { useGraphicQuality, useReducedMotion } from '../../hooks/useResponsive'
-import { onSystemReady } from '../../lib/systemStart'
 import LazyScene from '../three/LazyScene'
 import TextLink from '../shared/TextLink'
 import { profile, socialLinks } from '../../data/profile'
@@ -23,9 +22,8 @@ const ORBITS = [
 /**
  * Scene 01 — IDENTITY.
  * The lattice core drifts as the single focal visual, ringed by floating
- * technology labels. Identity is a compact editorial mark — small labels,
- * an outlined accent word, modest type and whitespace — with resume/LinkedIn
- * actions. A short load sequence plays once.
+ * technology labels. Entrance animation starts immediately after first
+ * paint — no loader gating.
  */
 export default function Hero() {
   const sectionRef = useRef(null)
@@ -66,48 +64,54 @@ export default function Hero() {
     }
   }, [])
 
+  // Entrance animation — runs immediately after first paint, no loader gate.
   useEffect(() => {
-    if (reduced) return
     const section = sectionRef.current
     if (!section) return
 
-    // Intro builds when the loader reports "system ready" (or after a safety
-    // timeout so gating can never stall the reveal). Content stays visible
-    // behind the opaque loader, then lifts in as it fades out.
+    if (reduced) {
+      section.classList.remove('hero-entrance')
+      const core = section.querySelector('[data-id-core]')
+      if (core) core.style.opacity = '1'
+      return
+    }
+
     let ctx = null
-    const build = () => {
-      if (ctx) return
+    let rafId = 0
+
+    rafId = requestAnimationFrame(() => {
       ctx = gsap.context(() => {
         const q = gsap.utils.selector(section)
-        // geometry arrives first, then the identity pieces assemble in order.
-        const tl = gsap.timeline({ defaults: { ease: EASE.out } })
+        const tl = gsap.timeline({
+          defaults: { ease: EASE.out },
+          onComplete: () => {
+            section.classList.remove('hero-entrance')
+          },
+        })
 
         gsap.fromTo(
           q('[data-id-core]'),
           { opacity: 0 },
-          { opacity: 1, duration: 1.4, ease: 'power2.out' }
+          { opacity: 1, duration: 1.2, ease: 'power2.out' }
         )
-        tl.fromTo(q('[data-id-brand]'), { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.5 })
-          .fromTo(q('[data-id-orbit]'), { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.6, stagger: 0.08 }, '-=0.3')
-          .fromTo(q('[data-id-mark]'), { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5 }, '-=0.4')
+
+        tl.fromTo(q('[data-id-brand]'), { opacity: 0, y: -8 }, { opacity: 1, y: 0, duration: 0.4 })
+          .fromTo(q('[data-id-orbit]'), { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.5, stagger: 0.06 }, '-=0.2')
+          .fromTo(q('[data-id-mark]'), { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.4 }, '-=0.3')
           .fromTo(
             q('[data-id-name] .sw-word'),
-            { clipPath: 'inset(0 0 100% 0)', y: '18%' },
-            { clipPath: 'inset(0 0 0% 0)', y: '0%', duration: 0.8, stagger: 0.14, ease: EASE.expo },
-            '-=0.25'
+            { clipPath: 'inset(0 0 100% 0)', y: '15%' },
+            { clipPath: 'inset(0 0 0% 0)', y: '0%', duration: 0.6, stagger: 0.1, ease: EASE.expo },
+            '-=0.2'
           )
-          .fromTo(q('[data-id-line]'), { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.1 }, '-=0.45')
-          .fromTo(q('[data-id-cta] > *'), { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.1 }, '-=0.4')
-          .fromTo(q('[data-id-cue]'), { opacity: 0 }, { opacity: 1, duration: 0.6 }, '-=0.1')
+          .fromTo(q('[data-id-line]'), { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.08 }, '-=0.3')
+          .fromTo(q('[data-id-cta] > *'), { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.08 }, '-=0.3')
+          .fromTo(q('[data-id-cue]'), { opacity: 0 }, { opacity: 1, duration: 0.4 }, '-=0.1')
       }, section)
-    }
-
-    const fallback = window.setTimeout(build, 2600)
-    const off = onSystemReady(build)
+    })
 
     return () => {
-      window.clearTimeout(fallback)
-      off()
+      cancelAnimationFrame(rafId)
       if (ctx) ctx.revert()
     }
   }, [reduced])
@@ -117,9 +121,9 @@ export default function Hero() {
       id="scene-identity"
       ref={sectionRef}
       aria-label="Identity"
-      className="relative flex min-h-[100svh] items-end overflow-hidden"
+      className="relative flex min-h-[100svh] items-end overflow-hidden hero-entrance"
     >
-      {/* WebGL landscape */}
+      {/* WebGL landscape — eager mount, no IntersectionObserver delay */}
       <div
         ref={visualRef}
         data-id-core
@@ -133,6 +137,7 @@ export default function Hero() {
           scrollRef={scrollRef}
           mouseRef={mouseRef}
           pulseRef={pulseRef}
+          eager
         />
       </div>
 
@@ -211,7 +216,6 @@ export default function Hero() {
       <div
         data-id-cue
         className="hero-cue absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-3"
-        style={{ opacity: reduced ? 1 : 0 }}
       >
         <span className="font-mono text-[9px] uppercase tracking-meta text-white/45">
           Scroll to explore

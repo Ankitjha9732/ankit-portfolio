@@ -279,6 +279,10 @@ function useCompactCore() {
  * Hero identity scene — a connected-node lattice core inside a drifting
  * particle field. Reacts to pointer (parallax), pointer velocity (pulse on
  * the core), and page scroll (slow vertical drift).
+ *
+ * @param {Function} [onCreated] - Called when the R3F canvas first renders.
+ *   Useful for coordinating the parent wrapper fade-in with actual canvas
+ *   readiness instead of a fixed timer.
  */
 export default function IdentityScene({
   quality = 'high',
@@ -286,6 +290,7 @@ export default function IdentityScene({
   scrollRef = { current: { y: 0 } },
   mouseRef = { current: { x: 0, y: 0 } },
   pulseRef = { current: 0 },
+  onCreated,
 }) {
   const isMobile = quality === 'low'
   const { y, scale } = useCompactCore()
@@ -296,9 +301,10 @@ export default function IdentityScene({
       gl={{ antialias: !isMobile, alpha: true, powerPreference: 'high-performance' }}
       camera={{ position: [0, 0, 6.5], fov: 52 }}
       frameloop={reducedMotion ? 'demand' : 'always'}
+      onCreated={onCreated}
     >
       <Rig reducedMotion={reducedMotion} scrollRef={scrollRef} mouseRef={mouseRef}>
-        <ParticleField count={isMobile ? 320 : 700} spread={isMobile ? 6.5 : 8} animate={!reducedMotion} />
+        <ParticleField count={isMobile ? 240 : 700} spread={isMobile ? 6.5 : 8} animate={!reducedMotion} />
         <group position={[0, y, 0]} scale={scale}>
           <Core pulseRef={pulseRef} />
         </group>

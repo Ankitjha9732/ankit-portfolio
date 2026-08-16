@@ -304,6 +304,20 @@
     }
   }
 
+  /* ── Hero entrance: elements hidden before GSAP animates them in.
+       The class is on the section; GSAP's fromTo matches this state so
+       there is never a flash of unstyled content. Removed by timeline
+       onComplete and by the reduced-motion path. */
+  .hero-entrance [data-id-brand],
+  .hero-entrance [data-id-orbit],
+  .hero-entrance [data-id-mark],
+  .hero-entrance [data-id-name] .sw-word,
+  .hero-entrance [data-id-line],
+  .hero-entrance [data-id-cta] > *,
+  .hero-entrance [data-id-cue] {
+    opacity: 0;
+  }
+
   /* ── Initial loading overlay (app-level) ────────────────────────────── */
   .loader-overlay {
     position: fixed;
@@ -330,7 +344,7 @@
 
   .loader-kicker {
     font-family: 'SUSE Mono', ui-monospace, monospace;
-    font-size: 10px;
+    font-size: 13px;
     letter-spacing: 0.3em;
     text-transform: uppercase;
     color: var(--violet-soft);
@@ -339,7 +353,7 @@
   .loader-sub {
     margin-top: 0.45rem;
     font-family: 'SUSE Mono', ui-monospace, monospace;
-    font-size: 8px;
+    font-size: 11px;
     letter-spacing: 0.24em;
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.35);
@@ -348,15 +362,15 @@
   .loader-status {
     margin-top: 1.5rem;
     font-family: 'SUSE Mono', ui-monospace, monospace;
-    font-size: 9px;
+    font-size: 12px;
     letter-spacing: 0.22em;
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.5);
   }
 
   .loader-bar {
-    width: 200px;
-    height: 1px;
+    width: 240px;
+    height: 2px;
     margin: 0.65rem auto 0;
     background: rgba(255, 255, 255, 0.12);
     overflow: hidden;
@@ -374,7 +388,7 @@
   .loader-pct {
     margin-top: 0.45rem;
     font-family: 'SUSE Mono', ui-monospace, monospace;
-    font-size: 9px;
+    font-size: 12px;
     letter-spacing: 0.22em;
     color: var(--violet-soft);
   }

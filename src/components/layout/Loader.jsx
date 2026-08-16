@@ -5,11 +5,18 @@ import { signalSystemReady } from '../../lib/systemStart'
 
 const PHRASES = ['INITIALIZING…', 'LOADING EXPERIENCE…', 'SYSTEM READY']
 
+const T_FADE_IN = 0.4
+const T_FILL = 1.4
+const T_HOLD = 0.4
+const T_FADE_OUT = 0.4
+
 /**
- * Initial-page loading overlay. Mounts once at app start, plays a short
- * "system initialization" sequence (~1s), then fades out and unmounts.
- * Signals "system ready" the moment it begins fading so the Hero intro
- * hands off seamlessly. Skipped entirely for reduced-motion users.
+ * Initial-page loading overlay. Mounts once at app start, plays a fast
+ * "system initialization" sequence so every status phrase stays readable
+ * (~2.6s), then fades out and unmounts. Signals "system ready" the
+ * moment it begins fading so the Hero intro hands off seamlessly. Reduced
+ * motion is respected: the progress bar is not animated, but the overlay is
+ * still shown statically so the text remains visible before it fades.
  */
 export default function Loader() {
   const reduced = useReducedMotion()
@@ -17,7 +24,6 @@ export default function Loader() {
   const [gone, setGone] = useState(false)
 
   useEffect(() => {
-    if (reduced) return
     const el = overlayRef.current
     if (!el) return
 
@@ -27,15 +33,32 @@ export default function Loader() {
       const pctEl = q('[data-loader-pct]')[0]
       const fill = q('[data-loader-fill]')[0]
 
+      // Static variant for reduced-motion: nothing animates, the fill sits at
+      // 100% so the status text is simply readable before a calm fade.
+      if (reduced) {
+        if (fill) fill.style.transform = 'scaleX(1)'
+        if (pctEl) pctEl.textContent = '100%'
+        if (statusEl) statusEl.textContent = PHRASES[2]
+        gsap.to(el, {
+          opacity: 0,
+          delay: 1.6,
+          duration: T_FADE_OUT,
+          ease: 'power2.inOut',
+          onStart: signalSystemReady,
+          onComplete: () => setGone(true),
+        })
+        return
+      }
+
       const tl = gsap.timeline()
       tl.fromTo(
         q('[data-loader-inner]'),
         { opacity: 0, y: 12 },
-        { opacity: 1, y: 0, duration: 0.28, ease: 'power2.out' }
+        { opacity: 1, y: 0, duration: T_FADE_IN, ease: 'power2.out' }
       )
         .to(fill, {
           scaleX: 1,
-          duration: 0.55,
+          duration: T_FILL,
           ease: 'power2.inOut',
           onUpdate() {
             const p = Math.round(this.progress() * 100)
@@ -46,9 +69,11 @@ export default function Loader() {
             }
           },
         })
+        // longer hold so "SYSTEM READY" is readable before the fade
+        .to({}, { duration: T_HOLD })
         .to(el, {
           opacity: 0,
-          duration: 0.32,
+          duration: T_FADE_OUT,
           ease: 'power2.inOut',
           onStart: signalSystemReady,
           onComplete: () => setGone(true),
@@ -58,7 +83,7 @@ export default function Loader() {
     return () => ctx.revert()
   }, [reduced])
 
-  if (reduced || gone) return null
+  if (gone) return null
 
   return (
     <div className="loader-overlay" ref={overlayRef} role="status" aria-label="Loading">

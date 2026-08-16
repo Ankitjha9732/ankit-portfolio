@@ -18,46 +18,63 @@ export default function About() {
     const section = sectionRef.current
     if (!section) return
 
-    const ctx = gsap.context(() => {
-      const q = gsap.utils.selector(section)
+    let ctx = null
+    let cancelled = false
 
-      scrubWordReveal(q('[data-story-words]'))
+    // Wait for webfonts before splitting words, so SplitText measures the
+    // real type and the scrub reveal isn't offset/re-laid-out by the font
+    // swap. Bounded by a timeout so gating can never stall the timeline.
+    const build = () => {
+      if (cancelled || sectionRef.current !== section) return
+      ctx = gsap.context(() => {
+        const q = gsap.utils.selector(section)
 
-      riseIn(q('[data-rise]'), { y: 24, stagger: 0.05 })
+        scrubWordReveal(q('[data-story-words]'))
 
-      gsap.fromTo(
-        q('[data-plate]'),
-        { y: 46 },
-        {
-          y: -46,
-          ease: EASE.drift,
-          scrollTrigger: {
-            trigger: q('[data-plate-wrap]')[0],
-            start: 'top bottom',
-            end: 'bottom top',
-            scrub: true,
-          },
-        }
-      )
+        riseIn(q('[data-rise]'), { y: 24, stagger: 0.05 })
 
-      // thin rule that draws itself with a violet marker
-      gsap.fromTo(
-        q('[data-rule]')[0],
-        { scaleY: 0 },
-        {
-          scaleY: 1,
-          ease: EASE.drift,
-          scrollTrigger: {
-            trigger: q('[data-story-words]')[0],
-            start: 'top 75%',
-            end: 'bottom 40%',
-            scrub: true,
-          },
-        }
-      )
-    }, section)
+        gsap.fromTo(
+          q('[data-plate]'),
+          { y: 46 },
+          {
+            y: -46,
+            ease: EASE.drift,
+            scrollTrigger: {
+              trigger: q('[data-plate-wrap]')[0],
+              start: 'top bottom',
+              end: 'bottom top',
+              scrub: true,
+            },
+          }
+        )
 
-    return () => ctx.revert()
+        // thin rule that draws itself with a violet marker
+        gsap.fromTo(
+          q('[data-rule]')[0],
+          { scaleY: 0 },
+          {
+            scaleY: 1,
+            ease: EASE.drift,
+            scrollTrigger: {
+              trigger: q('[data-story-words]')[0],
+              start: 'top 75%',
+              end: 'bottom 40%',
+              scrub: true,
+            },
+          }
+        )
+      }, section)
+    }
+
+    const fontsReady = document.fonts ? document.fonts.ready : Promise.resolve()
+    fontsReady.then(build)
+    const timeout = window.setTimeout(build, 2000)
+
+    return () => {
+      cancelled = true
+      window.clearTimeout(timeout)
+      if (ctx) ctx.revert()
+    }
   }, [reduced])
 
   return (

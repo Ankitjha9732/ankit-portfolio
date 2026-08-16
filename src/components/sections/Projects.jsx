@@ -11,6 +11,15 @@ const SyllabusScene = lazy(() => import('../three/SyllabusScene'))
 const RestroScene = lazy(() => import('../three/RestroScene'))
 const RepoReadyScene = lazy(() => import('../three/RepoReadyScene'))
 
+/* Warm the three scene modules as the section approaches, so the scroll into
+   each case finds a parsed, cached chunk instead of paying the import + WebGL
+   init at the moment the canvas should already be visible. */
+function warmProjectScenes() {
+  import('../three/SyllabusScene')
+  import('../three/RestroScene')
+  import('../three/RepoReadyScene')
+}
+
 /* Scene progress runs within the stay-visible sticky window of each case:
    the world reaches its final state by `SPLIT` (fraction) of the case
    travel, then holds — instead of dragging across the whole tall section. */
@@ -196,7 +205,21 @@ function CaseStudy({ project, index, stages, Scene, quality, reduced }) {
                 featured ? 'h-[90vh]' : 'h-[88vh]'
               }`}
             >
-              <LazyScene Component={Scene} progressRef={drive} quality={quality} reducedMotion={reduced} />
+              <LazyScene
+                Component={Scene}
+                progressRef={drive}
+                quality={quality}
+                reducedMotion={reduced}
+                offset={1000}
+                fallback={
+                  <div
+                    aria-hidden="true"
+                    className="flex h-full w-full items-center justify-center"
+                  >
+                    <span className="h-px w-16 animate-pulse bg-violet-500/50" />
+                  </div>
+                }
+              />
 
               <div className="vignette-base pointer-events-none absolute inset-0" />
 
@@ -348,6 +371,22 @@ export default function Projects() {
     }, ref)
     return () => ctx.revert()
   }, [reduced])
+
+  useEffect(() => {
+    const section = ref.current
+    if (!section) return
+    const obs = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          warmProjectScenes()
+          obs.disconnect()
+        }
+      },
+      { rootMargin: '900px 0px' }
+    )
+    obs.observe(section)
+    return () => obs.disconnect()
+  }, [])
 
   return (
     <section id="scene-work" ref={ref} aria-label="Work" className="relative overflow-hidden">

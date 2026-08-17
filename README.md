@@ -1,16 +1,87 @@
-# React + Vite
+# 🧑‍🚀 Ankit Jha — Portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A design-first personal portfolio built with **React**, **Three.js**, and **GSAP**. It's my UI/UX showpiece — focused on motion, interaction detail, and a polished responsive experience across desktop and mobile.
 
-Currently, two official plugins are available:
+**Live site** → [ankit-portfolio-puce.vercel.app](https://ankit-portfolio-puce.vercel.app/)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## ✨ Features
 
-## React Compiler
+- **3D interactive scenes** built with React Three Fiber (One, Three.js) — hero, projects, and about sections
+- **GSAP scroll animations** with Lenis smooth scrolling
+- **Custom micro-interactions** — magnetic buttons, custom cursor, and a progress navigation
+- **Complete section set** — Hero, About, Skills, Projects, Education, Journey, Contact
+- **Contact form** powered by EmailJS
+- **Fully responsive** mobile-first layouts
+- **Lazy scene loading** for better initial performance
+- Error boundary and custom loading experience
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🧰 Tech Stack
 
-## Expanding the ESLint configuration
+| Area | Tech |
+|------|------|
+| Core | React 19, Vite |
+| Styling | Tailwind CSS, custom CSS |
+| Motion | GSAP, Lenis (smooth scroll) |
+| 3D / WebGL | Three.js, @react-three/fiber, @react-three/drei |
+| Icons | react-icons |
+| Forms | EmailJS |
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🚀 Getting Started
+
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Create your environment file
+cp .env.example .env   # add your EmailJS keys
+
+# 3. Run the dev server
+npm run dev            # http://localhost:5173
+```
+
+### Production build
+
+```bash
+npm run build && npm run preview
+```
+
+## 🔐 Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `VITE_EMAILJS_SERVICE_ID` | Your EmailJS service ID |
+| `VITE_EMAILJS_TEMPLATE_ID` | Your EmailJS template ID |
+| `VITE_EMAILJS_PUBLIC_KEY` | Your EmailJS public key |
+
+Create an account at [emailjs.com](https://www.emailjs.com) to obtain these keys.
+
+## 🌍 Deployment
+
+Deployed on **Vercel**. Every push to `main` triggers an automatic production build.
+
+## 📁 Project Structure
+
+```text
+src/
+├── animations/         # GSAP scroll & entrance animations
+├── components/
+│   ├── layout/         # Layout, Loader, ProgressNav
+│   ├── sections/       # Hero, About, Skills, Projects, Education, Journey, Contact
+│   ├── shared/         # CustomCursor, Magnetic, TextLink, ErrorBoundary
+│   └── three/          # React Three Fiber scenes (Identity, Restro, Syllabus…)
+├── data/               # content: projects, skills, education, profile
+├── hooks/              # useMagnetic, useResponsive, useScrollProgress, useSmoothScroll
+├── lib/                # helpers (scroll, system start)
+├── pages/              # Home
+└── styles/             # globals, index
+```
+
+## 🗺️ Roadmap
+
+- Add a dark/light theme toggle
+- Improve accessibility pass and keyboard navigation
+- Add case-study pages for featured projects
+
+## 📬 Contact
+
+Want to collaborate or hire me? Reach out via the [contact form](https://ankit-portfolio-puce.vercel.app/) or on [LinkedIn](https://www.linkedin.com/in/ankitjhaa/).

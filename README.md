@@ -10,7 +10,7 @@ A design-first personal portfolio built with **React**, **Three.js**, and **GSAP
 - **GSAP scroll animations** with Lenis smooth scrolling
 - **Custom micro-interactions** — magnetic buttons, custom cursor, and a progress navigation
 - **Complete section set** — Hero, About, Skills, Projects, Education, Journey, Contact
-- **Contact form** powered by EmailJS
+- **Contact section** with direct `mailto:` reach-out
 - **Fully responsive** mobile-first layouts
 - **Lazy scene loading** for better initial performance
 - Error boundary and custom loading experience
@@ -32,10 +32,7 @@ A design-first personal portfolio built with **React**, **Three.js**, and **GSAP
 # 1. Install dependencies
 npm install
 
-# 2. Create your environment file
-cp .env.example .env   # add your EmailJS keys
-
-# 3. Run the dev server
+# 2. Run the dev server
 npm run dev            # http://localhost:5173
 ```
 
@@ -44,16 +41,6 @@ npm run dev            # http://localhost:5173
 ```bash
 npm run build && npm run preview
 ```
-
-## 🔐 Environment Variables
-
-| Variable | Description |
-|----------|-------------|
-| `VITE_EMAILJS_SERVICE_ID` | Your EmailJS service ID |
-| `VITE_EMAILJS_TEMPLATE_ID` | Your EmailJS template ID |
-| `VITE_EMAILJS_PUBLIC_KEY` | Your EmailJS public key |
-
-Create an account at [emailjs.com](https://www.emailjs.com) to obtain these keys.
 
 ## 🌍 Deployment
 
